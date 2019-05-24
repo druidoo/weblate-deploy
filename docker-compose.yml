@@ -1,0 +1,21 @@
+version: '2'
+services:
+  weblate:
+    build: .
+    links:
+      - cache
+    ports:
+      - 8099:80
+    volumes:
+      - ./data/weblate:/app/data
+    env_file:
+      - ./environment
+    restart: always
+    depends_on:
+      - cache
+  cache:
+    image: redis:4-alpine
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./data/redis:/data
