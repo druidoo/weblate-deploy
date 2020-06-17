@@ -55,6 +55,7 @@ services:
             # Also used for https authentication on repositories
             GITHUB_USER: 
             GITHUB_TOKEN: 
+            SYNC_COMPONENTS_INTERVAL: 1200
             REPOS_YAML: |-
                 druidoo:
                     druidoo-addons:

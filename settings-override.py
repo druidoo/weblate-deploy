@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 from weblate.celery import app
 
 
@@ -14,9 +14,8 @@ def wocg_druidoo():
 
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
-    print('Setting up periodic task for druidoo')
     sender.add_periodic_task(
-        3600,
+        int(os.environ.get('SYNC_COMPONENTS_INTERVAL', 3600)),
         wocg_druidoo.s(),
         name='wocg-druidoo',
     )
