@@ -22,8 +22,8 @@ services:
             WEBLATE_EMAIL_USER: 
             WEBLATE_EMAIL_PASSWORD:
             
-            #WEBLATE_DEBUG: 1
-            #WEBLATE_LOGLEVEL: DEBUG
+            WEBLATE_DEBUG: 1
+            WEBLATE_LOGLEVEL: DEBUG
             WEBLATE_ALLOWED_HOSTS: '*'
             WEBLATE_REGISTRATION_OPEN: 1
             WEBLATE_SIMPLIFY_LANGUAGES: 0
@@ -48,7 +48,7 @@ services:
 
             #WEBLATE_OFFLOAD_INDEXING: 1
             #WEBLATE_GOOGLE_ANALYTICS_ID: 
-            #WEBLATE_ENABLE_HTTPS: 1
+            WEBLATE_ENABLE_HTTPS: 1
             WEBLATE_REQUIRE_LOGIN: 1
 
             # Used by the wocg tools to generate addons
