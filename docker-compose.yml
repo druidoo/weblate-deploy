@@ -1,21 +1,90 @@
 version: '2'
 services:
-  weblate:
-    build: .
-    links:
-      - cache
-    ports:
-      - 8001:8080
-    volumes:
-      - ./data/weblate:/app/data
-    env_file:
-      - ./environment
-    restart: unless-stopped
-    depends_on:
-      - cache
-  cache:
-    image: redis:4-alpine
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - ./data/redis:/data
+
+    weblate:
+        image: druidoo/weblate-deploy:latest
+        ports:
+            - 8001:8080
+        volumes:
+            - weblate:/app/data
+            - ./settings-override.py:/app/data/settings-override.py
+        environment:
+
+            # Weblate setup
+            WEBLATE_SITE_TITLE: Druidoo Weblate
+            WEBLATE_ADMIN_NAME: Weblate Admin
+            WEBLATE_ADMIN_EMAIL:
+            WEBLATE_ADMIN_PASSWORD:
+            WEBLATE_SERVER_EMAIL: noreply@druidoo.io
+            WEBLATE_DEFAULT_FROM_EMAIL: 
+
+            # Mail server, the server has to listen on port 587 and understand TLS
+            WEBLATE_EMAIL_HOST: 
+            WEBLATE_EMAIL_USER: 
+            WEBLATE_EMAIL_PASSWORD:
+            
+            #WEBLATE_DEBUG: 1
+            #WEBLATE_LOGLEVEL: DEBUG
+            WEBLATE_ALLOWED_HOSTS: '*'
+            WEBLATE_REGISTRATION_OPEN: 1
+            WEBLATE_SIMPLIFY_LANGUAGES: 0
+            WEBLATE_AUTO_UPDATE: 1
+
+            # PostgreSQL setup
+            POSTGRES_PASSWORD: weblate
+            POSTGRES_USER: weblate
+            POSTGRES_DATABASE: weblate
+            POSTGRES_HOST: database
+            POSTGRES_PORT: 
+
+            # see https://github.com/organizations/druidoo/settings/applications
+            WEBLATE_SOCIAL_AUTH_GITHUB_KEY:
+            WEBLATE_SOCIAL_AUTH_GITHUB_SECRET:
+            #WEBLATE_SOCIAL_AUTH_BITBUCKET_KEY: 
+            #WEBLATE_SOCIAL_AUTH_BITBUCKET_SECRET: 
+            #WEBLATE_SOCIAL_AUTH_FACEBOOK_KEY: 
+            #WEBLATE_SOCIAL_AUTH_FACEBOOK_SECRET: 
+            #WEBLATE_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: 
+            #WEBLATE_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: 
+
+            #WEBLATE_OFFLOAD_INDEXING: 1
+            #WEBLATE_GOOGLE_ANALYTICS_ID: 
+            #WEBLATE_ENABLE_HTTPS: 1
+            WEBLATE_REQUIRE_LOGIN: 1
+
+            # Used by the wocg tools to generate addons
+            # Also used for https authentication on repositories
+            GITHUB_USER: 
+            GITHUB_TOKEN: 
+            REPOS_YAML: |-
+                druidoo:
+                    druidoo-addons:
+                        - 12.0
+                        - 13.0
+                    enterprise-addons:
+                        - 12.0
+                        - 13.0
+
+        depends_on:
+            - cache
+            - database
+
+    database:
+        image: postgres:11-alpine
+        environment:
+            POSTGRES_USER: weblate
+            POSTGRES_PASSWORD: weblate
+            POSTGRES_DATABASE: weblate
+        volumes:
+            - database:/var/lib/postgresql/data
+
+    cache:
+        image: redis:4-alpine
+        command: ["redis-server", "--appendonly", "yes"]
+        volumes:
+            - cache:/data
+
+volumes:
+    weblate:
+    cache:
+    database:

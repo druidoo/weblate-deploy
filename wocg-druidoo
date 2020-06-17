@@ -1,18 +1,51 @@
-#!/bin/python
+#!/usr/bin/python3
+import os
+import sys
 import subprocess
+import kaptan
+from string import Template
 
-REPOSITORIES = [
-    ('druidoo-addons', '12.0'),
-]
+# Handle https security
+GITHUB_USER = os.environ.get('GITHUB_USER')
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
+if GITHUB_USER and GITHUB_TOKEN:
+    GITHUB_URL = "https://{github_user}:{github_token}@github.com/{org}/{repo}.git"
+    default_vals = {'github_user': GITHUB_USER, 'github_token': GITHUB_TOKEN}
+else:
+    GITHUB_URL = "https://github.com/{org}/{repo}.git"
+    default_vals = {}
 
-for repo, branch in REPOSITORIES:
-    subprocess.check_call([
-        '/usr/local/bin/wocg-create-project',
-        '--repository', 'https://github.com/druidoo/' + repo,
-        '--branch', branch,
-        '--tmpl-component-slug', '0-druidoo-project-template-addon',
-    ])
+# Repos YAML from env
+REPOS_YAML = os.environ.get('REPOS_YAML')
+if not REPOS_YAML:
+    print("You have to define you REPOS_YAML")
+    exit(1)
 
-subprocess.check_call([
-    '/usr/local/bin/wocg-create-components',
-])
+REPOSITORIES = kaptan.Kaptan(handler="yaml").import_config(REPOS_YAML).get()
+
+# Process
+for org, repos in REPOSITORIES.items():
+    for repo, branches in repos.items():
+        vals = default_vals.copy()
+        vals.update({'org': org, 'repo': repo})
+        repo_url = GITHUB_URL.format(**vals)
+        for branch in branches:
+            print("Processing: %s:%s" % (repo_url, branch))
+            subprocess.check_call(
+                [
+                    'wocg-create-project',
+                    '--repository', repo_url,
+                    '--branch', str(branch),
+                    '--tmpl-component-slug', '0-druidoo-project-template-addon',
+                ],
+                stderr=sys.stderr,
+                stdout=sys.stdout,
+            )
+
+subprocess.check_call(
+    [
+        'wocg-create-components',
+    ],
+    stderr=sys.stderr,
+    stdout=sys.stdout,
+)
