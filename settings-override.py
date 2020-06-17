@@ -16,7 +16,7 @@ def wocg_druidoo():
 def setup_periodic_tasks(sender, **kwargs):
     print('Setting up periodic task for druidoo')
     sender.add_periodic_task(
-        10,
+        3600,
         wocg_druidoo.s(),
         name='wocg-druidoo',
     )

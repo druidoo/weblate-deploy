@@ -6,5 +6,9 @@ RUN pip3 install git+https://github.com/steingabelgaard/weblate-odoo-component-g
 RUN pip3 install kaptan
 
 COPY wocg-druidoo /usr/local/bin/
-
 USER 1000
+
+COPY entrypoint.sh        /home/weblate/
+COPY settings-override.py /home/weblate/
+
+ENTRYPOINT ["/home/weblate/entrypoint.sh"]

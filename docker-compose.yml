@@ -2,21 +2,20 @@ version: '2'
 services:
 
     weblate:
-        image: druidoo/weblate-deploy:latest
+        build: .
         ports:
-            - 8001:8080
+            - 8080:8080
         volumes:
             - weblate:/app/data
-            - ./settings-override.py:/app/data/settings-override.py
         environment:
 
             # Weblate setup
             WEBLATE_SITE_TITLE: Druidoo Weblate
             WEBLATE_ADMIN_NAME: Weblate Admin
-            WEBLATE_ADMIN_EMAIL:
+            WEBLATE_ADMIN_EMAIL: weblate@druidoo.io
             WEBLATE_ADMIN_PASSWORD:
             WEBLATE_SERVER_EMAIL: noreply@druidoo.io
-            WEBLATE_DEFAULT_FROM_EMAIL: 
+            WEBLATE_DEFAULT_FROM_EMAIL: weblate@druidoo.io
 
             # Mail server, the server has to listen on port 587 and understand TLS
             WEBLATE_EMAIL_HOST: 
